@@ -1,0 +1,8 @@
+\copy analytics.customers FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce.csv' WITH (FORMAT csv, HEADER true);
+\copy analytics.products FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_products.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.campaigns FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_campaigns.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.sessions FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_sessions.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.orders FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_orders.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.order_items FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_order_line.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.marketing_spend FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_marketing_spend.csv' WITH (FORMAT csv, HEADER true)
+\copy analytics.marketing_spend_by_campaign FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_campaign_spend.csv' WITH (FORMAT csv, HEADER true)
