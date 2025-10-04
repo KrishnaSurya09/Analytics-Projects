@@ -1,8 +1,23 @@
-\copy analytics.customers FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce.csv' WITH (FORMAT csv, HEADER true);
-\copy analytics.products FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_products.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.campaigns FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_campaigns.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.sessions FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_sessions.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.orders FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_orders.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.order_items FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_order_line.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.marketing_spend FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_marketing_spend.csv' WITH (FORMAT csv, HEADER true)
-\copy analytics.marketing_spend_by_campaign FROM 'C:\Users\ksury\Documents\Project work\analytics_portfolio_data_ecommerce_campaign_spend.csv' WITH (FORMAT csv, HEADER true)
+--Customer data
+\copy public.customers FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_customer.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Product data
+\copy public.products FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_products.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Campaign data
+\copy public.campaigns FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_campaigns.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Sessions data
+\copy public.sessions FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_sessions.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Orders data
+\copy public.orders FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_orders.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Order line data
+\copy public.order_items FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_order_line.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Marketing spend data
+\copy public.marketing_spend FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_marketing_spend.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
+
+--Spend by campaign data
+\copy public.marketing_spend_by_campaign FROM 'C:/Users/ksury/Documents/Project work/analytics_portfolio_data_ecommerce_campaign_spend.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', NULL '')
