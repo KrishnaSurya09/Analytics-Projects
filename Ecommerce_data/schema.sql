@@ -2,7 +2,7 @@ SELECT current_database();
 
 CREATE SCHEMA IF NOT EXISTS analytics;
 
--- Drop existing tables in dependency order (if re-running)
+-- Drop existing tables in dependency order
 DROP TABLE IF EXISTS analytics.order_items CASCADE;
 DROP TABLE IF EXISTS analytics.orders CASCADE;
 DROP TABLE IF EXISTS analytics.sessions CASCADE;
