@@ -1,0 +1,63 @@
+name: Build Analytics Models (Aiven PostgreSQL)
+
+on:
+  push:
+    branches: [main]
+    paths: ["models/**.sql"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Ensure target schema exists
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: 27742
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "CREATE SCHEMA IF NOT EXISTS analytics;"
+
+      - name: Run changed SQL models
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: 27742
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+        run: |
+          set -euo pipefail
+          # Run only changed SQL files (for all, use: files=$(ls -1 models/*.sql | sort))
+          files=$(git diff --name-only HEAD~1 HEAD -- 'models/*.sql' | sort || true)
+          if [ -z "$files" ]; then
+            echo "No changed SQL models."
+            exit 0
+          fi
+          for f in $files; do
+            echo "=== Executing $f ==="
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Refresh materialized views (optional)
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: 27742
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+
