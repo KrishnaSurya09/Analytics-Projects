@@ -1,0 +1,12 @@
+ecommerce:
+  target: prod
+  outputs:
+    prod:
+      type: postgres
+      host: analytics-analytics-6e35.d.aivencloud.com
+      port: 27742
+      user: ci_migrator
+      password: "{{ env_var('DB_PASSWORD') }}"
+      dbname: defaultdb
+      schema: public
+      sslmode: require

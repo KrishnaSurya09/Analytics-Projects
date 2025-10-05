@@ -7,6 +7,8 @@ on:
       - "Ecommerce_data/**/*.sql"
       - "Ecommerce_data/**/*.psql"
       - ".github/workflows/project.yml"
+      - "dbt_project.yml"
+      - "profiles/profiles.yml"
   workflow_dispatch: {}
 
 jobs:
@@ -28,7 +30,7 @@ jobs:
           PGPORT: "27742"
           PGDATABASE: defaultdb
           PGUSER: ci_migrator
-          PGPASSWORD: Krishna@cloud09
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
           PGSSLMODE: require
         shell: bash
         run: |
@@ -58,7 +60,7 @@ jobs:
           PGPORT: "27742"
           PGDATABASE: defaultdb
           PGUSER: ci_migrator
-          PGPASSWORD: Krishna@cloud09
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
           PGSSLMODE: require
         run: |
           psql -v ON_ERROR_STOP=1 -c "SELECT 'Workflow executed successfully' AS status, NOW() AS executed_at;"

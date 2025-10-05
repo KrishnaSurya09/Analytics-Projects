@@ -1,0 +1,9 @@
+name: ecommerce
+version: 1.0.0
+profile: ecommerce
+
+model-paths: ["models"]
+
+models:
+  +schema: public   
+  +materialized: view      
