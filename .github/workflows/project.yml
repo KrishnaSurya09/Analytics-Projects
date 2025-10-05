@@ -1,0 +1,76 @@
+name: Build Analytics Models (Aiven PostgreSQL)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "schema.sql"
+      - "Ecommerce_data/**.psql"
+      - ".github/workflows/project.yaml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Ensure analytics schema exists
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: "27742"
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "CREATE SCHEMA IF NOT EXISTS analytics;"
+
+      - name: Apply schema.sql (raw tables)
+        if: hashFiles('schema.sql') != ''
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: "27742"
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+        run: |
+          psql -v ON_ERROR_STOP=1 -f schema.sql
+
+      - name: Run Ecommerce_data loaders
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: "27742"
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: Krishna@cloud09
+          PGSSLMODE: require
+        run: |
+          for f in Ecommerce_data/*.psql; do
+            [ -f "$f" ] || continue
+            echo "=== Executing $f ==="
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Run analysis models (optional)
+        env:
+          PGHOST: analytics-analytics-6e35.d.aivencloud.com
+          PGPORT: "27742"
+          PGDATABASE: defaultdb
+          PGUSER: ci_migrator
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          PGSSLMODE: require
+        run: |
+          for f in models/*.sql; do
+            [ -f "$f" ] || continue
+            echo "=== Executing $f ==="
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
