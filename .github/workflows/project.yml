@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "Ecommerce_data/**/*.sql"
+      - "Ecommerce_data/**/*.psql"
       - ".github/workflows/project.yml"
   workflow_dispatch: {}
 
@@ -29,31 +30,35 @@ jobs:
           PGUSER: ci_migrator
           PGPASSWORD: Krishna@cloud09
           PGSSLMODE: require
+        shell: bash
         run: |
           set -euo pipefail
-          shopt -s nullglob
 
-          # Determine files to run: changed on this push; if first run, run all
+          # Build a list of .sql/.psql files to run
           if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-            files=$(git diff --name-only HEAD~1 HEAD -- 'Ecommerce_data/**/*.sql' 'Ecommerce_data/**/*.psql' | sort || true)
+            # only files changed in this push
+            mapfile -t files < <(git diff --name-only HEAD~1 HEAD -- \
+                                   'Ecommerce_data/**/*.sql' 'Ecommerce_data/**/*.psql' \
+                                 | xargs -I{} bash -lc '[ -f "{}" ] && echo "{}"' \
+                                 | sort -u)
           else
-            files=$(ls -1 **/Ecommerce_data/**/*.sql **/Ecommerce_data/**/*.psql 2>/dev/null | sort || true)
+            # first run: all files in the folder
+            mapfile -t files < <(find Ecommerce_data -type f \( -name '*.sql' -o -name '*.psql' \) | sort)
           fi
 
-          if [ -z "$files" ]; then
+          if [ ${#files[@]} -eq 0 ]; then
             echo "No SQL changes in Ecommerce_data/."
             exit 0
           fi
 
-          echo "Running:"
-          printf '  %s\n' $files
+          echo "Running these files:"
+          printf '  %s\n' "${files[@]}"
 
-          for f in $files; do
+          for f in "${files[@]}"; do
             echo "=== Executing $f ==="
             psql -v ON_ERROR_STOP=1 -f "$f"
           done
 
-      # Optional: sanity check
       - name: Smoke check
         env:
           PGHOST: analytics-analytics-6e35.d.aivencloud.com
