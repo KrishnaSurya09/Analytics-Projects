@@ -1,27 +1,28 @@
-name: Run Ecommerce SQL (Aiven PostgreSQL)
+name: Run New or Updated SQL (Aiven PostgreSQL)
 
 on:
   push:
     branches: [main]
     paths:
       - "Ecommerce_data/**/*.sql"
+      - "Ecommerce_data/**/*.psql"
       - ".github/workflows/project.yml"
   workflow_dispatch: {}
 
 jobs:
-  run-ecommerce-sql:
+  run-new-sql:
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Execute changed SQL in Ecommerce_data/
+      - name: Execute only new or modified SQL files
         env:
           PGHOST: analytics-analytics-6e35.d.aivencloud.com
           PGPORT: "27742"
@@ -33,32 +34,25 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Build a list of .sql/.psql files to run
-          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-            # only files changed in this push
-            mapfile -t files < <(git diff --name-only HEAD~1 HEAD -- \
-                                   'Ecommerce_data/**/*.sql' 'Ecommerce_data/**/*.psql' \
-                                 | xargs -I{} bash -lc '[ -f "{}" ] && echo "{}"' \
-                                 | sort -u)
-          else
-            # first run: all files in the folder
-            mapfile -t files < <(find Ecommerce_data -type f \( -name '*.sql' -o -name '*.psql' \) | sort)
-          fi
+          # Get only the new or modified files in this commit
+          mapfile -t files < <(git diff --name-only origin/main...HEAD -- 'Ecommerce_data/**/*.sql' 'Ecommerce_data/**/*.psql' | grep -v '^$' || true)
 
           if [ ${#files[@]} -eq 0 ]; then
-            echo "No SQL changes in Ecommerce_data/."
+            echo "No new or updated SQL files found."
             exit 0
           fi
 
-          echo "Running these files:"
+          echo "Running new or updated SQL files:"
           printf '  %s\n' "${files[@]}"
 
           for f in "${files[@]}"; do
-            echo "=== Executing $f ==="
-            psql -v ON_ERROR_STOP=1 -f "$f"
+            if [ -f "$f" ]; then
+              echo "=== Executing $f ==="
+              psql -v ON_ERROR_STOP=1 -1 -f "$f"
+            fi
           done
 
-      - name: Smoke check
+      - name: Verify connection (optional sanity check)
         env:
           PGHOST: analytics-analytics-6e35.d.aivencloud.com
           PGPORT: "27742"
@@ -67,4 +61,4 @@ jobs:
           PGPASSWORD: Krishna@cloud09
           PGSSLMODE: require
         run: |
-          psql -v ON_ERROR_STOP=1 -c "SELECT now() AS ran_at;"
+          psql -v ON_ERROR_STOP=1 -c "SELECT 'Workflow executed successfully' AS status, NOW() AS executed_at;"
