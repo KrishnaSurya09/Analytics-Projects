@@ -1,4 +1,10 @@
-CREATE TABLE public.campaign_orders AS
+{
+  { 
+    config(materialized='table') 
+  }
+  
+}
+
  SELECT
   o.order_id,
   o.order_date::date                   AS dt,

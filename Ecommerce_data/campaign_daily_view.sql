@@ -1,4 +1,11 @@
-CREATE TABLE public.campaign_summary AS
+{
+  { 
+    config(materialized='table') 
+  }
+  
+}
+
+
 WITH sess AS (
   SELECT s.campaign_id, s.session_date::date AS dt, COUNT(*) AS sessions
   FROM public.sessions s
