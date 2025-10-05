@@ -30,7 +30,7 @@ jobs:
           PGPORT: "27742"
           PGDATABASE: defaultdb
           PGUSER: ci_migrator
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          PGPASSWORD: Krishna@cloud09
           PGSSLMODE: require
         run: |
           echo "Running schema.sql"
@@ -43,7 +43,7 @@ jobs:
           PGPORT: "27742"
           PGDATABASE: defaultdb
           PGUSER: ci_migrator
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          PGPASSWORD: Krishna@cloud09
           PGSSLMODE: require
         run: |
           set -euo pipefail
