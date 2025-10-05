@@ -1,4 +1,4 @@
-CREATE TABLE public.campaign_orders AS
+CREATE TABLE public.campaign_orders_test AS
  SELECT
   o.order_id,
   o.order_date::date                   AS dt,
