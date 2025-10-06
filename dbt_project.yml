@@ -2,7 +2,7 @@ name: ecommerce
 version: 1.0.0
 profile: ecommerce
 
-model-paths: ["models"]
+model-paths: ["Ecommerce_data"]
 
 models:
   +schema: public   

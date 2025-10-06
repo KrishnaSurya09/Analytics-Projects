@@ -12,57 +12,22 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  run-new-sql:
+  dbt:
     runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
-      # used by dbt profiles.yml -> {{ env_var('DB_PASSWORD') }}
+      # used by profiles/profiles.yml: password: "{{ env_var('DB_PASSWORD') }}"
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      # so we don't need to pass --profiles-dir each command
       DBT_PROFILES_DIR: profiles
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   
+          fetch-depth: 0   # helpful if you later use state/selection by diff
 
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
-
-      - name: Execute only new or modified SQL files (plain psql)
-        env:
-          PGHOST: analytics-analytics-6e35.d.aivencloud.com
-          PGPORT: "27742"
-          PGDATABASE: defaultdb
-          PGUSER: ci_migrator
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
-          PGSSLMODE: require
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          mapfile -t files < <(
-            git diff --name-only origin/main...HEAD \
-              -- 'Ecommerce_data/**/*.sql' 'Ecommerce_data/**/*.psql' \
-            | grep -v '^$' || true
-          )
-
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No new or updated SQL files found."
-          else
-            echo "Running new or updated SQL files:"
-            printf '  %s\n' "${files[@]}"
-            for f in "${files[@]}"; do
-              if [ -f "$f" ]; then
-                echo "=== Executing $f ==="
-                # -1 = single-transaction
-                psql -v ON_ERROR_STOP=1 -1 -f "$f"
-              fi
-            done
-          fi
-
-      # ---------- dbt section ----------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -73,17 +38,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-postgres
 
-      - name: dbt debug (check connection)
+      - name: dbt debug (verify connection)
         run: dbt debug --no-use-colors
 
-      # ---------- simple sanity check ----------
-      - name: Verify connection
-        env:
-          PGHOST: analytics-analytics-6e35.d.aivencloud.com
-          PGPORT: "27742"
-          PGDATABASE: defaultdb
-          PGUSER: ci_migrator
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
-          PGSSLMODE: require
+      # Optional: run seeds if you add CSVs under ./seeds
+      - name: dbt seed (optional)
         run: |
-          psql -v ON_ERROR_STOP=1 -c "SELECT 'Workflow executed successfully' AS status, NOW() AS executed_at;"
+          if [ -d "seeds" ] && [ -n "$(find seeds -type f -name '*.csv' -print -quit)" ]; then
+            dbt seed --no-use-colors
+          else
+            echo "No seeds to load."
+          fi
+
+      # Build everything (models + tests)
+      - name: dbt build
+        run: dbt build --no-use-colors
