@@ -17,14 +17,14 @@ jobs:
     permissions:
       contents: read
     env:
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}  # used in profiles.yml via {{ env_var('DB_PASSWORD') }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }} 
       DBT_PROFILES_DIR: profiles
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # handy for future state/selection
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -39,7 +39,7 @@ jobs:
       - name: dbt debug (verify connection & profile)
         run: dbt debug --no-use-colors
 
-      # Optional: run seeds if you add CSVs under ./seeds
+      # run seeds
       - name: dbt seed (optional)
         run: |
           if [ -d "seeds" ] && [ -n "$(find seeds -type f -name '*.csv' -print -quit)" ]; then
@@ -48,11 +48,11 @@ jobs:
             echo "No seeds to load."
           fi
 
-      # 🔥 Build models (this is the step you were missing)
+      #Run DBT models and tests
       - name: dbt build (models + tests)
         run: dbt build --no-use-colors
 
-      # Helpful: list the models dbt saw (quick sanity check in logs)
+      #list the models dbt saw (quick sanity check in logs)
       - name: dbt ls (show models)
         run: dbt ls --resource-type model
 
