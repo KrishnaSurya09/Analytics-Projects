@@ -17,16 +17,14 @@ jobs:
     permissions:
       contents: read
     env:
-      # used by profiles/profiles.yml: password: "{{ env_var('DB_PASSWORD') }}"
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      # so we don't need to pass --profiles-dir each command
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}  # used in profiles.yml via {{ env_var('DB_PASSWORD') }}
       DBT_PROFILES_DIR: profiles
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # helpful if you later use state/selection by diff
+          fetch-depth: 0  # handy for future state/selection
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -38,7 +36,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-postgres
 
-      - name: dbt debug (verify connection)
+      - name: dbt debug (verify connection & profile)
         run: dbt debug --no-use-colors
 
       # Optional: run seeds if you add CSVs under ./seeds
@@ -49,3 +47,13 @@ jobs:
           else
             echo "No seeds to load."
           fi
+
+      # 🔥 Build models (this is the step you were missing)
+      - name: dbt build (models + tests)
+        run: dbt build --no-use-colors
+
+      # Helpful: list the models dbt saw (quick sanity check in logs)
+      - name: dbt ls (show models)
+        run: dbt ls --resource-type model
+
+    
