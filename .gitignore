@@ -1,0 +1,4 @@
+# dbt artifacts
+target/
+logs/
+profiles/.user.yml
