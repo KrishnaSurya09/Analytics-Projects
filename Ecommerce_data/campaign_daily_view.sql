@@ -34,50 +34,46 @@ spend AS (
   GROUP BY 1,2
 ),
 all_rows AS (
-
-  SELECT
-    dt,
-    campaign_id,
-    channel,
-    spend,
-    0::bigint  AS sessions,
-    0::bigint  AS orders,
-    0::bigint  AS customers,
-    0::bigint  AS new_customers,
-    0::numeric AS revenue,
-    0::numeric AS gross_profit
+  SELECT dt, campaign_id, channel, spend,
+         0::bigint AS sessions, 0::bigint AS orders, 0::bigint AS customers,
+         0::bigint AS new_customers, 0::numeric AS revenue, 0::numeric AS gross_profit
   FROM spend
   UNION ALL
-  SELECT dt, campaign_id, NULL::text AS channel,
-         0::numeric AS spend,
-         sessions,
-         0::bigint  AS orders,
-         0::bigint  AS customers,
-         0::bigint  AS new_customers,
-         0::numeric AS revenue,
-         0::numeric AS gross_profit
+  SELECT dt, campaign_id, NULL::text, 0::numeric,
+         sessions, 0::bigint, 0::bigint, 0::bigint, 0::numeric, 0::numeric
   FROM sess
   UNION ALL
-  SELECT dt, campaign_id, NULL::text AS channel,
-         0::numeric AS spend,
-         0::bigint  AS sessions,
-         orders,
-         customers,
-         new_customers,
-         revenue,
-         gross_profit
+  SELECT dt, campaign_id, NULL::text, 0::numeric,
+         0::bigint, orders, customers, new_customers, revenue, gross_profit
   FROM ord
+),
+agg AS (
+  SELECT
+    dt AS date,
+    campaign_id,
+    MIN(channel)              AS channel,
+    SUM(spend)                AS spend,
+    SUM(sessions)             AS sessions,
+    SUM(orders)               AS orders,
+    SUM(customers)            AS customers,
+    SUM(new_customers)        AS new_customers,
+    SUM(revenue)              AS revenue,
+    SUM(gross_profit)         AS gross_profit
+  FROM all_rows
+  GROUP BY dt, campaign_id
 )
 SELECT
-  dt AS date,
-  campaign_id,
-  MIN(channel)              AS channel,
-  SUM(spend)                AS spend,
-  SUM(sessions)             AS sessions,
-  SUM(orders)               AS orders,
-  SUM(customers)            AS customers,
-  SUM(new_customers)        AS new_customers,
-  SUM(revenue)              AS revenue,
-  SUM(gross_profit)         AS gross_profit
-FROM all_rows
-GROUP BY dt, campaign_id
+  a.date,
+  a.campaign_id,
+  c.campaign_name,
+  a.channel,
+  a.spend,
+  a.sessions,
+  a.orders,
+  a.customers,
+  a.new_customers,
+  a.revenue,
+  a.gross_profit
+FROM agg a
+LEFT JOIN public.campaigns c
+  ON c.campaign_id = a.campaign_id
