@@ -1,4 +1,4 @@
-{{ config(materialized='table', schema='public') }}
+{{ config(materialized='table') }}
  SELECT
   o.order_id,
   o.order_date::date                   AS dt,
