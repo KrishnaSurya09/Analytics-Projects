@@ -1,3 +1,8 @@
 {
-    "dbtPowerUser.profilesDir": "${workspaceFolder}\\profiles"
+  "python.defaultInterpreterPath": ".venv\\Scripts\\python.exe",                 // or your Python path
+  "dbtPowerUser.pythonPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",  // same interpreter
+  "dbtPowerUser.profilesDir": "${workspaceFolder}/profiles",
+  "terminal.integrated.env.windows": {
+    "DBT_PROFILES_DIR": "${workspaceFolder}\\profiles"
+  }
 }
