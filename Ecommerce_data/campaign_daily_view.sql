@@ -1,9 +1,4 @@
-{
-  { 
-    config(materialized='table') 
-  }
-  
-}
+{{ config(materialized='table', schema='public') }}
 
 
 WITH sess AS (
