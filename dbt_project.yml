@@ -4,3 +4,8 @@ profile: ecommerce
 
 model-paths: ["Ecommerce_data"]
 models: {}
+
+quoting:
+  database: false
+  schema: false
+  identifier: false
