@@ -2,7 +2,7 @@ name: ecommerce
 version: 1.0.0
 profile: ecommerce
 
-model-paths: ["Ecommerce_data"]
+model-paths: ["Ecommerce_data_modeling"]
 models: {}
 
 quoting:

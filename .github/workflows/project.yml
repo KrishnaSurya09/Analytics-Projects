@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "Ecommerce_data/**/*.sql"
-      - "Ecommerce_data/**/*.psql"
+      - "Ecommerce_data_modeling/**/*.sql"
+      - "Ecommerce_data_modeling/**/*.psql"
       - ".github/workflows/project.yml"
       - "dbt_project.yml"
       - "profiles/profiles.yml"
