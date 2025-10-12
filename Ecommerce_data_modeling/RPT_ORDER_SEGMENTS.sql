@@ -1,7 +1,7 @@
 {{ config(materialized='table') }}
 
 WITH params AS (
-  SELECT 60::int AS engage_recency_days
+  SELECT 180::int AS engage_recency_days
 ),
 orders_enriched AS (
   SELECT
